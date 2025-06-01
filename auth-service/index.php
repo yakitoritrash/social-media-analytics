@@ -5,8 +5,10 @@ use Slim\Factory\AppFactory;
 
 require __DIR__ . '/vendor/autoload.php';
 
+// Initialize App with PSR-7
 $app = AppFactory::create();
 
+//Test
 $app->get('/test', function (Request $request, Response $response) {
   $response->getBody()->write("Auth service running!");
   return $response;
