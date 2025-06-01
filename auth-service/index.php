@@ -8,7 +8,13 @@ require __DIR__ . '/vendor/autoload.php';
 // Initialize App with PSR-7
 $app = AppFactory::create();
 
-$db = new PDO("mysql:host=localhost;dbname=social_auth", "auth_user", "password");
+$db = new PDO(
+  "mysql:host=localhost;dbname=social_auth",
+  "root",
+  "password"
+);
+
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 //Test
 $app->get('/test', function (Request $request, Response $response) {
@@ -17,4 +23,3 @@ $app->get('/test', function (Request $request, Response $response) {
 });
 
 $app->run();
-
