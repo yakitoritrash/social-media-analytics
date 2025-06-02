@@ -59,7 +59,7 @@ try {
   $insertStmt = $db->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
   $insertStmt->execute([$data['username'], $hash]);
 
-  $response->getBody()->write(json_encode(["success" => true, "message" => "User registerred"]));
+  $response->getBody()->write(json_encode(["success" => true, "message" => "User registered."]));
   return $response
     ->withHeader('Content-Type', 'application/json')
     ->withStatus(201);
