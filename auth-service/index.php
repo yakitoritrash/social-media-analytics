@@ -29,7 +29,15 @@ $app->get('/test-db', function (Request $request, Response $response) use ($db) 
   return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->post('/login', function (Request $request, Response $response) use ($db) {
+$app->post('/register', function (Request $request, Response $response) use ($db) {
   $data = $request->getParsedBody();
+
+  if (empty($data['username']) || empty($data['password'])) {
+    $response->getBody()->write(json_encode(["error" => "Username and password required"]));
+    return $response
+      ->withHeader('Content-Type', 'application/json')
+      ->withStatus(400);
+  }
+
 });
 $app->run();
