@@ -2,30 +2,34 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
+use Dotenv\Dotenv;
 
 require __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
 
 // Initialize App with PSR-7
 $app = AppFactory::create();
 
-$db = new PDO(
-  "mysql:host=localhost;dbname=social_auth",
-  "root",
-  "password"
-);
 
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 try {
-  $db->query("SELECT 1");
-  echo "DB connection working!";
+  $db = new PDO(
+    "mysql:unix_socket=/run/mysqld/mysqld.sock; ;dbname=" . $_ENV['DB_NAME'],
+    $_ENV['DB_USER'],
+    $_ENV['DB_PASS'],
+  );
 } catch (PDOException $e) {
-  die("Connection failed: " . $e->getMessage());
+  die("DB Connection failed: " . $e->getMessage());
 }
 //Test
-$app->get('/test', function (Request $request, Response $response) {
-  $response->getBody()->write("Auth service running!");
-  return $response;
+
+$app->get('/test-db', function (Request $request, Response $response) use ($db) {
+  $stmt = $db->query("SELECT 1 AS test");
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $response->getBody()->write(json_encode($result));
+  return $response->withHeader('Content-Type', 'application/json');
 });
 
 $app->run();
