@@ -16,7 +16,7 @@ $app->addRoutingMiddleware();
 
 try {
   $db = new PDO(
-    "mysql:unix_socket=/run/mysqld/mysqld.sock; ;dbname=" . $_ENV['DB_NAME'],
+    "mysql:unix_socket=/run/mysqld/mysqld.sock;dbname=" . $_ENV['DB_NAME'],
     $_ENV['DB_USER'],
     $_ENV['DB_PASS'],
   );
