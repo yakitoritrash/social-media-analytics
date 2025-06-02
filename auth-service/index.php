@@ -12,8 +12,6 @@ $dotenv->safeLoad();
 // Initialize App with PSR-7
 $app = AppFactory::create();
 
-
-
 try {
   $db = new PDO(
     "mysql:unix_socket=/run/mysqld/mysqld.sock; ;dbname=" . $_ENV['DB_NAME'],
@@ -25,11 +23,13 @@ try {
 }
 //Test
 
-$app->get('/test-db', function (Request $request, Response $response) use ($db) {
-  $stmt = $db->query("SELECT 1 AS test");
+$app->get('/test-db', function (Request $request, Response $response) use ($db) { $stmt = $db->query("SELECT 1 AS test");
   $result = $stmt->fetch(PDO::FETCH_ASSOC);
   $response->getBody()->write(json_encode($result));
   return $response->withHeader('Content-Type', 'application/json');
 });
 
+$app->post('/login', function (Request $request, Response $response) use ($db) {
+  $data = $request->getParsedBody();
+});
 $app->run();
