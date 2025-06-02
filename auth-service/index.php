@@ -16,6 +16,12 @@ $db = new PDO(
 
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+try {
+  $db->query("SELECT 1");
+  echo "DB connection working!";
+} catch (PDOException $e) {
+  die("Connection failed: " . $e->getMessage());
+}
 //Test
 $app->get('/test', function (Request $request, Response $response) {
   $response->getBody()->write("Auth service running!");
