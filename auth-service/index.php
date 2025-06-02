@@ -38,6 +38,31 @@ $app->post('/register', function (Request $request, Response $response) use ($db
       ->withHeader('Content-Type', 'application/json')
       ->withStatus(400);
   }
+$hash = password_hash($data['password'], PASSWORD_BCRYPT);
 
+try {
+  $checkStmt = $db->prepare("SELECT id FROM users WHERE username = ?");
+  $checkStmt->execute([$data['username']]);
+
+  if ($checkStmt->fetch()) {
+    $response->getBody()->write(json_encode(["error" => "Username already exists"]));
+    return $response
+      ->withHeader('Content-Type', 'application/json')
+      ->withStatus(400);
+  }
+  $insertStmt = $db->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
+  $insertStmt->execute([$data['username'], $hash]);
+
+  $response->getBody()->write(json_encode(["success" => true, "message" => "User registerred"]));
+  return $response
+    ->withHeader('Content-Type', 'application/json')
+    ->withStatus(201);
+} catch (PDOException $e) {
+  $response->getBody()->write(json_encode(["error" => "Registration failed", "detail" => $e->getMessage()]));
+  return $response
+    ->withHeader('Content-Type', 'application/json')
+    ->withStatus(500);
+}
 });
+
 $app->run();
