@@ -11,6 +11,8 @@ $dotenv->safeLoad();
 
 // Initialize App with PSR-7
 $app = AppFactory::create();
+$app->addBodyParsingMiddleware();
+$app->addRoutingMiddleware();
 
 try {
   $db = new PDO(
@@ -30,8 +32,12 @@ $app->get('/test-db', function (Request $request, Response $response) use ($db) 
 });
 
 $app->post('/register', function (Request $request, Response $response) use ($db) {
-  $data = $request->getParsedBody();
 
+  $rawInput = $request->getBody()->getContents();
+  error_log("Raw input: " . $rawInput);
+
+  $data = $request->getParsedBody();
+  error_log("Parsed input: " . print_r($data, true));
   if (empty($data['username']) || empty($data['password'])) {
     $response->getBody()->write(json_encode(["error" => "Username and password required"]));
     return $response
