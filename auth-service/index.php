@@ -32,10 +32,6 @@ $app->get('/test-db', function (Request $request, Response $response) use ($db) 
 });
 
 $app->post('/register', function (Request $request, Response $response) use ($db) {
-
-  $rawInput = $request->getBody()->getContents();
-  error_log("Raw input: " . $rawInput);
-
   $data = $request->getParsedBody();
   error_log("Parsed input: " . print_r($data, true));
   if (empty($data['username']) || empty($data['password'])) {
