@@ -1,0 +1,72 @@
+
+
+services:
+  auth:
+    build: ./auth-service
+    ports: ["8000:80"]
+    env_file: .env
+    depends_on:
+      - mariadb
+    volumes:
+      - ./auth-service:/var/www/html
+
+
+  posts:
+    build: ./post-service
+    ports: ["3000:3000"]
+    env_file: .env
+    depends_on:
+      - cassandra
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports: ["5173:5173"]
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+
+
+  mariadb:
+    image: mariadb:latest
+    env_file: .env
+    volumes:
+      - ./data/mysql:/vat/lib/mysql
+    ports: ["3306:3306"]
+  
+  cassandra:
+    image: cassandra:4
+    ports: ["9042:9042"]
+    volumes:
+      - ./data/cassandra:/var/lib/cassandra
+
+  redis:
+    image: redis:alpine
+    ports: ["6379:6379"]
+
+
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=Xms1g -Xmx1g
+    ports: ["9200:9200"]
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+
+  prometheus:
+    image: prom/prometheus
+    ports: ["9090:9090"]
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+
+
+  gteafana:
+    image: grafana/grafana
+    ports: ["3001:3000"]
+    depends_on:
+      - prometheus
