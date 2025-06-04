@@ -78,7 +78,7 @@ $app->post('/login', function (Request $request, Response $response) use ($db) {
     ->withStatus(400);
   }
 
-  $stmt = $db->prepare("SELCET id, password_hash FROM users WHERE username = ?");
+  $stmt = $db->prepare("SELECT id, password_hash FROM users WHERE username = ?");
   $stmt->execute([$data['username']]);
   $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
