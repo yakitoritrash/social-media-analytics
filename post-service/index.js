@@ -43,7 +43,8 @@ app.post('/posts/:id/like', async(req, res) => {
   const postId = cassandra.types.Uuid.fromString(req.params.id);
   const query = 'UPDATE posts SET likes = likes + ? WHERE post_id = ?';
   try {
-    await client.execute(query, [new Set([userId]), postId], { prepare: true });
+    await client.execute(query, [[userId], postId], { prepare: true });
+    res.sendStatus(200);
   } catch (err) {
     res.status(500).json({ error: 'Failed to like post' });
   } 
