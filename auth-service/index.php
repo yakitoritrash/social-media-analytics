@@ -77,5 +77,18 @@ $app->post('/login', function (Request $request, Response $response) use ($db) {
     ->withHeader('Content-Type', 'application/json')
     ->withStatus(400);
   }
+
+  $stmt = $db->prepare("SELCET id, password_hash FROM users WHERE username = ?");
+  $stmt->execute([$data['username']]);
+  $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if (!$user || !password_verify($data['password'], $user['password_hash'])) {
+    $response->getBody()->write(json_encode(["error" => "Invalid credentials"]));
+    return $response
+      ->withHeader('Content-Type', 'application/json')
+      ->withStatus(401);
+  }
+
+
 });
 $app->run();
