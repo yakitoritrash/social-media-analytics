@@ -3,6 +3,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -67,4 +69,13 @@ try {
 }
 });
 
+$app->post('/login', function (Request $request, Response $response) use ($db) {
+  $data = $request->getParsedBody();
+  if (empty($data['username']) || empty($data['password'])) {
+    $response->getBody()->write(json_encode(["error" => "Username and password required"]));
+    return $response
+    ->withHeader('Content-Type', 'application/json')
+    ->withStatus(400);
+  }
+});
 $app->run();
