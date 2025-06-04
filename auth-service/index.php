@@ -89,6 +89,39 @@ $app->post('/login', function (Request $request, Response $response) use ($db) {
       ->withStatus(401);
   }
 
+  $payload = [
+    'sub' => $user['id'],
+    'username' => $data['username'],
+    'iat' => time(),
+    'exp' => time() + 3600,
+  ];
 
+  $jwt = JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS256');
+
+  $response->getBody()->write(json_encode(["token" => $jwt]));
+  return $response->withHeader('Content-Type', 'application/json');
 });
+
+$authMiddleware = function (Request $request, $handler) {
+  $authHeader = $request->getHeaderLine('Authorization');
+  if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+    throw new \Slim\Exception\HttpUnauthorizedException($request, "Missing or invalid token");
+
+    $token = str_replace('Bearer ', '', $authHeader);
+    try {
+      $decoded = JWT::decode($token, new Key($_ENV['JWT_SECRET'], 'HS256'));
+      $request = $request->withAttribute('user', $decoded);
+      return $handler->handle($request);
+    } catch (Exception $e) {
+      throw new \Slim\Exception\HttpUnauthorizedException($request, "Invalid token");
+    }
+  }
+};
+
+$app->get('/protected-route', function (Request $req, Response $res) {
+  $user = $req->getAttribute('user');
+  $res->getBody()->write(json_encode(["msg" => "Hello " . $user->username]));
+  return $res->withHeader('Content-Type', 'application/json');
+})->add($authMiddleware);
+
 $app->run();
