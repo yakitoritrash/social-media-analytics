@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang = "en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Socket.IO Like test</title>
+    <script src= "https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>Real-Time Like Counter</h1>
+    <button onclick="sendLike()">Like Post</button>
+    <p id="likes">Waiting for like updates...</p>
+
+    <script>
+      const socket = io('http://localhost:4000');
+      const postId = 'post123';
+
+      function sendLike() {
+        socket.emit('like', postId);
+      }
+
+      socket.on('likeUpdate', ({ postId, likes }) => {
+        document.getElementById('likes').textContent = `Post ${postId} has ${likes} likes`;
+      });
+    
+    </script>
+  </body>
+</html>
