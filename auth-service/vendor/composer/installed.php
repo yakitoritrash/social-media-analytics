@@ -3,7 +3,7 @@
         'name' => 'yakitoritrash/auth-service',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b9ff14eb4a41f89e43090540e9b087ebfd189a5e',
+        'reference' => '0c2c25799d99d769bb5b8bedd6f8c6655c06c952',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -240,7 +240,7 @@
         'yakitoritrash/auth-service' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b9ff14eb4a41f89e43090540e9b087ebfd189a5e',
+            'reference' => '0c2c25799d99d769bb5b8bedd6f8c6655c06c952',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
