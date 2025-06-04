@@ -20,9 +20,17 @@ app.post('/posts', async (req, res) => {
   const post_id = uuidv4();
   const created_at = new Date();
 
-  const query = 'INSERT INTO posts (post_id, user_id, content, created_at, likes, comments) VALUES (?, ?, ?, ?, 0, [])'
+  const query = 'INSERT INTO posts (post_id, user_id, content, created_at, likes, comments) VALUES (?, ?, ?, ?, ?, ?)';
+  const params = [
+    post_id,
+    cassandra.types.Uuid.fromString(user_id),
+    content,
+    created_at,
+    [],
+    []
+  ];
   try {
-    await client.execute(query, [post_id, user_id, content, created_at], { prepare: true});
+    await client.execute(query, params, { prepare: true});
     res.status(201).json({ post_id });
   } catch (err) {
     console.error(err);
@@ -31,9 +39,11 @@ app.post('/posts', async (req, res) => {
 });
 
 app.post('/posts/:id/like', async(req, res) => {
-  const query = 'UPDATE posts SET likes = likes + 1 WHERE post_id = ?';
+  const userId = cassandra.types.Uuid.fromString(req.body.user_id);
+  const postId = cassandra.types.Uuid.fromString(req.params.id);
+  const query = 'UPDATE posts SET likes = likes + ? WHERE post_id = ?';
   try {
-    await client.execute(query, [req.params.id], { prepare: true });
+    await client.execute(query, [new Set([userId]), postId], { prepare: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to like post' });
   } 
@@ -41,9 +51,9 @@ app.post('/posts/:id/like', async(req, res) => {
 
 app.post('/posts/:id/comment', async (req, res) => {
   const { comment } = req.body;
-  const query = 'UPDATE posts SET comments = comments + [?] WHERE post_id = ?';
+  const query = 'UPDATE posts SET comments = comments + ? WHERE post_id = ?';
   try {
-    await client.execute(query, [comment, req.params.id], { prepare: true });
+    await client.execute(query, [[comment], req.params.id], { prepare: true });
     res.sendStatus(200);
   } catch {
     res.status(500).json({ error: 'Failed to comment' });
