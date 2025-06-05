@@ -12,7 +12,10 @@ export const loginUser = (data) =>
   axios.post(`${API_BASE}:8000/login`, data);
 
 export const createPost = (token, data) =>
-  axios.post(`${API_BASE}:3000/posts`, data, {
+  axios.post(`${API_BASE}:3001/posts`, {
+    user_id: data.userId,
+    content: data.content
+  }, {
     headers: { Authorization: `Bearer ${token}` }
   });
 

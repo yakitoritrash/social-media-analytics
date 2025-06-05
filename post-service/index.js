@@ -17,13 +17,16 @@ client.connect()
 
 app.post('/posts', async (req, res) => {
   const { user_id, content } = req.body;
+  if (!user_id || !/^[0-9a-fA-F-]{36}$/.test(user_id)) {
+    return res.status(400).json({ error: 'Invalid or missing user_id' });
+  }
   const post_id = uuidv4();
   const created_at = new Date();
 
   const query = 'INSERT INTO posts (post_id, user_id, content, created_at, likes, comments) VALUES (?, ?, ?, ?, ?, ?)';
   const params = [
     post_id,
-    cassandra.types.Uuid.fromString(user_id),
+    cassandra.types.parseInt(user_id),
     content,
     created_at,
     [],
@@ -39,7 +42,7 @@ app.post('/posts', async (req, res) => {
 });
 
 app.post('/posts/:id/like', async(req, res) => {
-  const userId = cassandra.types.Uuid.fromString(req.body.user_id);
+  const userId = cassandra.types.parseInt(req.body.user_id);
   const postId = cassandra.types.Uuid.fromString(req.params.id);
   const query = 'UPDATE posts SET likes = likes + ? WHERE post_id = ?';
   try {

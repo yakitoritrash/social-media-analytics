@@ -98,7 +98,10 @@ $app->post('/login', function (Request $request, Response $response) use ($db) {
 
   $jwt = JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS256');
 
-  $response->getBody()->write(json_encode(["token" => $jwt]));
+  $response->getBody()->write(json_encode([
+    "token" => $jwt,
+    "id" => $user['id']
+  ]));
   return $response->withHeader('Content-Type', 'application/json');
 });
 

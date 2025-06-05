@@ -1,15 +1,23 @@
 // src/App.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Login from "./Login";
 import PostForm from "./PostForm";
 import Feed from "./Feed";
 
 function App() {
   const [token, setToken] = useState(null);
-  const [userId, setUserId] = useState("a22c1b15-8dce-4c28-b4b6-16784e50b2ff"); // Dummy userId for testing
+  const [userId, setUserId] = useState(null); // Dummy userId for testing
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.token && user?.id) {
+      setToken(user.token);
+      setUserId(user.id);
+    }
+  }, []);
 
   if (!token) {
-    return <Login setToken={setToken} />;
+    return <Login setToken={setToken} setUserId={setUserId}/>;
   }
 
   return (

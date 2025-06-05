@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { registerUser, loginUser } from "./api";
 
-export default function Login({ setToken }) {
+export default function Login({ setToken, setUserId }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -19,7 +19,13 @@ export default function Login({ setToken }) {
   const handleLogin = async () => {
     try {
       const res = await loginUser({ username: name, password });
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ token: res.data.token, id: res.data.id })
+      );
       setToken(res.data.token);
+      setUserId(res.data.id);
     } catch (err) {
       alert("Login failed");
     }
