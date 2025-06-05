@@ -3,14 +3,17 @@ import axios from 'axios';
 const API_BASE = 'http://localhost';
 
 export const registerUser = (data) =>
-  axios.post(`${API_BASE}:8000/api/register`, data);
+  axios.post(`${API_BASE}:8000/register`, {
+    username: data.name,
+    password: data.password
+  });
 
 export const loginUser = (data) =>
-  axios.post(`${API_BASE}:8000/api/llogin`, data);
+  axios.post(`${API_BASE}:8000/login`, data);
 
 export const createPost = (token, data) =>
   axios.post(`${API_BASE}:3000/posts`, data, {
-    header: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }
   });
 
 export const likePost = (postId, userId) =>

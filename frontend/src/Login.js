@@ -1,3 +1,4 @@
+// src/Login.js
 import { useState } from "react";
 import { registerUser, loginUser } from "./api";
 
@@ -13,26 +14,26 @@ export default function Login({ setToken }) {
     } catch (err) {
       alert("Registration failed");
     }
-  
   };
 
   const handleLogin = async () => {
     try {
-      const res = await loginUser({ email, password });
+      const res = await loginUser({ username: name, password });
       setToken(res.data.token);
-    } catch {
+    } catch (err) {
       alert("Login failed");
     }
   };
 
   return (
     <div>
-      <h2>Login / Register </h2>
+      <h2>Login / Register</h2>
       <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
       <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
       <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
       <button onClick={handleRegister}>Register</button>
-      <button onClick={handLogin}>Login</button>
+      <button onClick={handleLogin}>Login</button>
     </div>
-    );
+  );
 }
+
