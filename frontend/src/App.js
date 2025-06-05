@@ -1,25 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import { useState } from "react";
+import Login from "./Login";
+import PostForm from "./PostForm";
+import Feed from "./Feed";
 
 function App() {
+  const [token, setToken] = useState(null);
+  const [userId, setUserId] = useState("a22c1b15-8dce-4c28-b4b6-16784e50b2ff"); // Dummy userId for testing
+
+  if (!token) {
+    return <Login setToken={setToken} />;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Social Dashboard</h1>
+      <PostForm token={token} userId={userId} />
+      <Feed userId={userId} />
     </div>
   );
 }
 
 export default App;
+
