@@ -9,6 +9,7 @@ export default function PostForm({ token, userId }) {
       await createPost(token, { userId, content });
       setContent("");
       alert("Post created");
+      setContent("");
     } catch (err) {
       alert("Error creating post");
     }
