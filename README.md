@@ -1,28 +1,56 @@
 # Social Media Analytics
 
-A real-time analytics service for tracking and broadcasting social media post likes, built with modern Node.js, Redis, WebSockets, and Express. Designed for scalability and performance, this project demonstrates how to build event-driven analytics with live updates and a robust backend architecture.
+A real-time analytics platform for social media posts, featuring a modern React frontend and a Node.js/Express backend with Redis and WebSocket support. Designed for scalable, interactive analytics with robust CI/CD pipelines.
 
 ---
 
 ## 🚀 Features
 
-- **Real-time Like Tracking:** Instantly captures and broadcasts "like" events across client applications.
-- **WebSocket Updates:** Uses [Socket.IO](https://socket.io/) to deliver live analytics updates to connected clients.
-- **High-Performance Backend:** Built with [Express.js](https://expressjs.com/) and [Node.js](https://nodejs.org/en).
-- **Fast Data Storage:** Integrates [Redis](https://redis.io/) for in-memory storage and atomic counters.
-- **Scalable Architecture:** Modular setup, ready for containerization and cloud deployment.
-- **CI/CD Ready:** Automated workflows for linting, testing, and deployment.
+- **Real-time Like Tracking:** Instantly captures and broadcasts "like" events to all connected clients.
+- **Live UI Updates:** Modern React frontend receives real-time analytics updates via WebSockets.
+- **User Auth & Post Creation:** Simple login and post interface for demo purposes.
+- **WebSocket API:** Backend uses [Socket.IO](https://socket.io/) for fast, bi-directional communication.
+- **High-Performance Backend:** Built on [Express.js](https://expressjs.com/) and [Node.js](https://nodejs.org/en).
+- **Fast Data Storage:** In-memory [Redis](https://redis.io/) for atomic like counters.
+- **Scalable Architecture:** Modular, containerizable (Docker support).
+- **CI/CD:** Automated workflows for linting, testing, and deployment.
 
 ---
 
 ## 📦 Tech Stack
 
-- **Backend Framework:** Express.js
-- **WebSockets:** Socket.IO
+- **Frontend:** React (Create React App structure)
+- **Backend:** Express.js + Socket.IO
 - **Data Store:** Redis (with optional [RedisBloom](https://redis.io/docs/data-types/probabilistic/) module support for advanced analytics)
-- **Runtime:** Node.js (18+ recommended)
+- **Runtime:** Node.js (18+)
 - **CI/CD:** GitHub Actions (see `.github/workflows/`)
-- **Package Management:** npm
+- **Containerization:** Docker
+
+---
+
+## 📁 Project Structure
+
+```
+social-media-analytics/
+├── analytics-service/
+│   ├── index.js           # Main backend server
+│   ├── package.json
+│   └── ...
+├── frontend/
+│   ├── src/
+│   │   ├── App.js         # Main React App
+│   │   ├── Login.js
+│   │   ├── PostForm.js
+│   │   └── Feed.js
+│   ├── public/
+│   ├── package.json
+│   ├── Dockerfile
+│   └── ...
+├── .gitignore
+└── README.md
+```
+
+![image1](image1)
 
 ---
 
@@ -30,54 +58,72 @@ A real-time analytics service for tracking and broadcasting social media post li
 
 ```mermaid
 graph LR
-    Client1 & Client2 -- WebSockets --> AnalyticsService
+    Client1[React App] -- WebSockets --> AnalyticsService
     AnalyticsService -- Redis Protocol --> Redis
-    AnalyticsService -- WebSockets --> Client1 & Client2
+    AnalyticsService -- WebSockets --> Client1[React App]
     subgraph AnalyticsService [Node.js/Express/Socket.IO]
     end
     subgraph Redis [Redis DB]
     end
 ```
 
-- **Clients** emit like events to the Analytics Service.
-- **Analytics Service** increments counters in Redis and broadcasts aggregated stats in real time via WebSockets.
-
 ---
 
-## 🚦 Local Development
+## 🖥️ Frontend (React)
 
-### Prerequisites
+- Located in the `/frontend` directory.
+- Built with React functional components and hooks.
+- Example core file: `src/App.js`:
+    ```js
+    import { useState, useEffect } from "react";
+    import Login from "./Login";
+    import PostForm from "./PostForm";
+    import Feed from "./Feed";
 
-- Node.js 18+
-- Redis server (local or cloud)
-- npm
+    // ... see code above ...
+    ```
+- Features:
+  - Login flow (dummy for demo)
+  - Post creation form
+  - Live-updating social feed (likes update in real time)
+  - WebSocket client connects to backend for instant updates
 
-### Getting Started
+### Local Development
 
 ```bash
-git clone https://github.com/yakitoritrash/social-media-analytics.git
-cd social-media-analytics/analytics-service
+cd frontend
 npm install
 npm start
 ```
 
-By default, the analytics service runs on **port 4000**.
+- The React app runs on port 3000 by default.
+- Make sure the backend (`analytics-service`) is running (see below).
 
 ---
 
-## ⚡ Usage Example
+## ⚡ Backend (Analytics Service)
 
-- Connect your frontend or test client to `ws://localhost:4000` using Socket.IO client.
-- Emit a `like` event with a post ID:
-    ```js
-    socket.emit('like', 'post123');
-    ```
-- Listen for live updates:
-    ```js
-    socket.on('likeUpdate', ({ postId, likes }) => {
-      console.log(`Post ${postId} now has ${likes} likes!`);
-    });
-    ```
+- Located in `/analytics-service`.
+- See `analytics-service/index.js`.
+- Express server with Socket.IO and Redis.
+
+### Local Development
+
+```bash
+cd analytics-service
+npm install
+npm start
+```
+
+- Runs on port 4000 by default.
+
+---
+
+## 🔗 Connecting Frontend & Backend
+
+- The React frontend communicates with the backend via HTTP (for REST endpoints, if any) and WebSockets (for live analytics).
+- Socket.IO client connects to `ws://localhost:4000` (default).
+- On "like" actions, the React UI emits events to the backend, which updates Redis and broadcasts new like counts to all clients.
 
 ---
 
@@ -101,29 +147,28 @@ See `.github/workflows/` for pipeline definitions.
 
 ---
 
-## 📁 Project Structure
+## 🐳 Docker Support
 
-```
-social-media-analytics/
-├── analytics-service/
-│   ├── index.js           # Main server code
-│   ├── package.json
-│   └── node_modules/
-├── .gitignore
-└── README.md
+Both frontend and backend have a `Dockerfile` for containerized builds and deployment.
+
+### Example (build & run frontend):
+
+```bash
+cd frontend
+docker build -t sma-frontend .
+docker run -p 3000:3000 sma-frontend
 ```
 
 ---
 
 ## 🔒 Environment Variables
 
-- Store sensitive configuration (like Redis connection strings) in a `.env` file at the project root.
-- Example:
+- Store sensitive config (like Redis connection strings) in `.env` files.
+- Example for backend:
     ```
     REDIS_URL=redis://localhost:6379
     ```
-
-*Note: `.env` is already gitignored.*
+- `.env` is gitignored.
 
 ---
 
@@ -144,6 +189,7 @@ Pull requests, issues, and suggestions are welcome! See [CONTRIBUTING.md](CONTRI
 - [Redis](https://redis.io/)
 - [Socket.IO](https://socket.io/)
 - [Express.js](https://expressjs.com/)
+- [React](https://react.dev/)
 - [GitHub Actions](https://github.com/features/actions)
 
 ---
